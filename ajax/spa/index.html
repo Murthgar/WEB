@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='UTF-8'>
+    <title>Mini SPA</title>
+    <link rel='stylesheet' href='../css/estilo.css'>
+    <style>
+        nav {
+            font-size: 2em;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #FFF;
+            padding: 0 10px;
+        }
+    </style>
+</head>
+
+<body class="conteudo">
+    <nav>
+        <a href wm-link="series.html" wm-destino=".pagina">Séries</a> |
+        <a href wm-link="linguagens.html" wm-destino=".pagina">Linguagens</a>
+    </nav>
+    <div class="pagina"></div>
+    <script>
+        function navegarViaAjax(url, seletor, push = true){
+            //validação inicial, se n tiver url ou seletor ele sai da função
+            if(!url || !seletor) return
+            const elemento = document.querySelector(seletor)
+            fetch(url)
+                //pegando o texto do html
+                .then(resp => resp.text())
+                //colocando o html dentro do elemento
+                .then(html => { 
+                    elemento.innerHTML = html
+                    //atualizando a url do navegador e colocando no historico
+                    if(push) {
+                        history.pushState({seletor}, "Página Ajax", url)
+                    }
+                })
+        }
+        
+        document.querySelectorAll('[wm-link]').forEach(link => {
+            //armazenando o valor do atributo no url
+            const url = link.attributes['wm-link'].value
+            //armazenando o destino no seletorDestino
+            const seletorDestino = link.attributes['wm-destino'].value
+            //capturando o evento de link no click
+            link.onclick = e => {
+                e.preventDefault()
+                navegarViaAjax(url, seletorDestino)
+            }
+        })
+
+        window.onpopstate = e => {
+            if(e.state) {
+                navegarViaAjax(window.location.href, e.state.seletor, false)
+            }
+        }
+        
+    </script>
+</body>

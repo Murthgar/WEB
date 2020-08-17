@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='UTF-8'>
+    <title>XMLHttpRequest #03</title>
+    <link rel='stylesheet' href='css/estilo.css'>
+</head>
+
+<body class="conteudo exercicio">
+    <h1>Estados</h1>
+
+    <script>
+        function ajax(config){
+            const xhr = new XMLHttpRequest()
+            xhr.open(config.metodo, config.url, true)
+            //Esse evento será chamado sempre que os status da requisição mudar
+            xhr.onreadystatechange = e => {
+                //se a requisição for finalizada e a resposta estiver pronta
+                if(xhr.readyState === 4){
+                    if(xhr.status === 200){
+                        //chama a função de sucesso
+                        config.sucesso(xhr.responseXML)
+                    }else if(xhr.status >= 400){
+                        //chama o erro
+                        config.erro({
+                            codigo: xhr.status,
+                            texto: xhr.statusText  
+                        })
+                    }
+                }
+            }
+            //envia a requisição
+            xhr.send()
+        }
+
+        ajax({
+            url: "dados/estados.xml",
+            metodo: "get",
+            sucesso(resposta){
+                //recebendo todos os estados como lista
+                const estados = resposta.getElementsByTagName('estado')
+                const itens = Array.from(estados).reduce(
+                    (html, estado) => html + `<li>${estado.attributes.nome.value}</li>`, ''
+                )
+                document.body.insertAdjacentHTML('beforeend',`<ul>${itens}</ul>`)
+            },
+            erro(e) {
+                const msg = document.createTextNode(`${e.codigo}: ${e.texto}`)
+                document.body.appendChild(msg)
+            }
+            
+        })
+
+    </script>
+</body>

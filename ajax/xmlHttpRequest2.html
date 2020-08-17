@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='UTF-8'>
+    <title>XMLHttpRequest #02</title>
+    <link rel='stylesheet' href='css/estilo.css'>
+    <style>
+        input[type=file] {
+            display: flex;
+            margin: 10px;
+            padding: 40px;
+            font-size: 40px;
+            background: crimson;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+
+<body class="conteudo exercicio">
+    <input type="file" name="arquivo" />
+    <div class="progresso"></div>
+
+    <script>
+        function ajaxUpload(config){
+            const xhr = new XMLHttpRequest()
+
+            //se essa funcionalidade estiver presente no objeto será feito o upload
+            if(xhr.upload){
+                //monitorando o progresso do upload
+                xhr.upload.onprogress = e => {
+                    const atual = e.loaded
+                    const total = e.total
+                    const percentual = Math.floor(atual / total * 100)
+                    config.progresso({atual,total,percentual})
+                }
+            }
+            //enviando a requisição ajax
+            xhr.open("post", config.url, true)
+            xhr.send(config.formData)
+        }
+
+        //iniciando o upload e monitorando o evento onchange
+        //pegando o input do tipo file
+        document.querySelector('input[type=file]').onchange = e =>{            
+            const formData = new FormData()
+            const inputFile = e.target
+            //passando o nome do arquivo para o objeto
+            formData.append(inputFile.name, inputFile.files[0])
+
+            //recebe um obejto
+            ajaxUpload({
+                //nome do endpoint colocado no servidor
+                url: "upload",
+                //constante com os dados
+                formData: formData,
+                //função de progresso
+                progresso(dados){
+                    //obtendo a div
+                    const progresso = document.querySelector('.progresso')
+                    //convertendo o objeto para string e enviando ara o innerhtml
+                    progresso.innerHTML = JSON.stringify(dados)
+                }
+            })
+        }
+    </script>
+</body>

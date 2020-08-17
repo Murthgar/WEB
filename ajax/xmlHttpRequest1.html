@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='UTF-8'>
+    <title>XMLHttpRequest #01</title>
+    <link rel='stylesheet' href='css/estilo.css'>
+</head>
+
+<body class="conteudo exercicio">
+    <h1>Estados</h1>
+
+    <script>
+        //Função recebe um objeto que representa as configurações
+        function ajax(config){
+            const xhr = new XMLHttpRequest()
+            //Abrir requisição e espera receber dentro de config um parametro chamado url, o ulçtimo parametro diz que essa função vai ser de forma assincrona
+            xhr.open(config.metodo, config.url, true)
+
+            xhr.onload = e => {
+                //Passa a resposta recebida caso a requisição seja retornada como sucesso
+                if(xhr.status === 200){
+                    config.sucesso(xhr.response)
+                //Se a resposta da requisição for negativa vai retornar o codigo do erro e a mensagem de texto
+                }else if (xhr.status >= 400){
+                    config.erro({
+                        codigo: xhr.status,
+                        texto: xhr.statusText
+                    })
+                }
+            }
+            //enviando a requisição
+            xhr.send()
+        } 
+
+        function criarTabela(estados){
+            //Transformando o array de estados em um conjunto de elementos
+            //Cada objeto estado será transforamdo em uma tablerow 
+            const linhas = estados.map(estado =>{
+                    const tdId = document.createElement('td')
+                    tdId.innerHTML = estado.id
+
+                    const tdNome = document.createElement('td')
+                    tdNome.innerHTML = estado.nome
+
+                    const tdSigla = document.createElement('td')
+                    tdSigla.innerHTML = estado.sigla
+
+                    const tr = document.createElement('tr')
+
+                    tr.appendChild(tdId)
+                    tr.appendChild(tdNome)
+                    tr.appendChild(tdSigla)
+                    return tr
+                })
+                //criando a tabela
+                const tabela = document.createElement('table')
+                //adicionando as linhas da tabela
+                linhas.forEach(linha => tabela.appendChild(linha))
+                //adicionando a tabela no body
+                document.body.appendChild(tabela) 
+        }
+        //chamando função ajax
+        ajax({
+            //Passando os parametros
+            url:"dados/estados.json",
+            metodo:"get",
+            //passando a função de sucesso como parametro - essa função receve resposta como parametro
+            sucesso(resposta){
+                //recebe uma lista de estados
+                const estados = JSON.parse(resposta)
+                //Chamando a função que cria a tabela
+                criarTabela(estados)                               
+            },
+            //função de erro caso de algum problema
+            erro(e) {
+                const msg = document.createTextNode(`${e.codigo}: ${e.texto}`)
+                //colocando o erro no documento
+                document.body.appendChild(msg)
+            }
+        })
+    </script>
+</body>
