@@ -1,5 +1,9 @@
-function soma(a,b){
-    return a + b
+function soma(a){
+    var a;
+    for(var i =0; i<a;i++){
+        console.log(i)
+        a--
+    }
 }
 
-console.log(soma(1,2))
+console.log(soma(5))
